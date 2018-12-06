@@ -8,7 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "v0rtex/xenial64"
 
     # Mount shared folder using NFS
-    config.vm.synced_folder ".", "/vagrant",
+    config.vm.synced_folder "/Users/scott/github", "/vagrant",
         id: "core",
         :nfs => true,
         :mount_options => ['nolock,vers=3,udp,noatime']

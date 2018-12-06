@@ -24,26 +24,26 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
 echo "-- Install packages --"
 sudo apt-get install -y --force-yes apache2 mysql-server-5.7 git-core nodejs rabbitmq-server redis-server
-sudo apt-get install -y --force-yes php7.1-common php7.1-dev php7.1-json php7.1-opcache php7.1-cli libapache2-mod-php7.1
-sudo apt-get install -y --force-yes php7.1 php7.1-mysql php7.1-fpm php7.1-curl php7.1-gd php7.1-mcrypt php7.1-mbstring
-sudo apt-get install -y --force-yes php7.1-bcmath php7.1-zip
+sudo apt-get install -y --force-yes php7.0-common php7.0-dev php7.0-json php7.0-opcache php7.0-cli libapache2-mod-php7.0
+sudo apt-get install -y --force-yes php7.0 php7.0-mysql php7.0-fpm php7.0-curl php7.0-gd php7.0-mcrypt php7.0-mbstring
+sudo apt-get install -y --force-yes php7.0-bcmath php7.0-zip
 Update
 
 echo "-- Configure PHP &Apache --"
-sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.1/apache2/php.ini
-sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.1/apache2/php.ini
+sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.0/apache2/php.ini
+sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.0/apache2/php.ini
 sudo a2enmod rewrite
 
 echo "-- Creating virtual hosts --"
-sudo ln -fs /vagrant/public/ /var/www/app
+sudo ln -fs /vagrant/mlbell /var/www/mlbell
 cat << EOF | sudo tee -a /etc/apache2/sites-available/default.conf
 <Directory "/var/www/">
     AllowOverride All
 </Directory>
 
 <VirtualHost *:80>
-    DocumentRoot /var/www/app
-    ServerName app.local
+    DocumentRoot /var/www/mlbell
+    ServerName mlbell.vm
 </VirtualHost>
 
 <VirtualHost *:80>
