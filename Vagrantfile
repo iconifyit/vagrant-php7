@@ -1,6 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+
+# ======================================================================================================
+# LOAD SETTINGS
+# ======================================================================================================
+
+require 'yaml'
+settings = YAML.load_file 'settings.yml'
+
+# ======================================================================================================
+# DO NOT MODIFY BELOW THIS LINE
+# ======================================================================================================
+
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -8,13 +20,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "v0rtex/xenial64"
 
     # Mount shared folder using NFS
-    config.vm.synced_folder "/Users/scott/github", "/vagrant",
+    # config.vm.synced_folder "/Users/scott/github", "/vagrant",
+    config.vm.synced_folder settings['repo_path'], "/vagrant",
         id: "core",
         :nfs => true,
         :mount_options => ['nolock,vers=3,udp,noatime']
 
     # Do some network configuration
-    config.vm.network "private_network", ip: "192.168.11.11"
+    config.vm.network "private_network", ip: settings['ip_address']
 
     # Assign a quarter of host memory and all available CPU's to VM
     # Depending on host OS this has to be done differently.
@@ -40,5 +53,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.provision :shell, :path => "bootstrap.sh"
+
+    # pass environ
+    # config.vm.provision :shell, :path => "bootstrap.sh", env: {"VAR_NAME" => "variable value"}
 
 end
