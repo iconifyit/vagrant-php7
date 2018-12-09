@@ -1,20 +1,39 @@
 #!/usr/bin/env bash
 
+# ======================================================================================================
+# USAGE:
+# ======================================================================================================
+
+# See bootstrap.sh for more instructions
+# Change `sudo ln -fs /vagrant/iconify/atomiclotusapparel.com /var/www/atomiclotusapparel.com` to
+#    "/path/from/vagrant/root" (which is a symbolic link to your local repo) "/path/to/webserver/path"
+#    (on the vm web server)
+# Find the code that looks like the below example, and modify the vhost paths to match
+#    the settings you entered for the above step.
+#
+#    cat << EOF | sudo tee -a /etc/apache2/sites-available/default.conf
+#    <Directory "/var/www/atomiclotusapparel.com">
+#        AllowOverride All
+#    </Directory>
+#
+#    <VirtualHost *:80>
+#        DocumentRoot /var/www/atomiclotusapparel.com
+#        ServerName mlbell.vm
+#    </VirtualHost>
+#
+#    <VirtualHost *:80>
+#        DocumentRoot /var/www/phpmyadmin
+#        ServerName phpmyadmin.local
+#    </VirtualHost>
+#    EOF
+# ======================================================================================================
+
 Update () {
     echo "-- Update packages --"
     sudo apt-get update
     sudo apt-get upgrade
 }
 Update
-
-# include parse_yaml function
-. parse_yaml.sh
-
-# read yaml file
-eval $(parse_yaml settings.yml "config_")
-
-# access yaml content
-echo $config_development_database
 
 echo "-- Prepare configuration for MySQL --"
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password root"
@@ -33,26 +52,30 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
 echo "-- Install packages --"
 sudo apt-get install -y --force-yes apache2 mysql-server-5.7 git-core nodejs rabbitmq-server redis-server
-sudo apt-get install -y --force-yes php7.0-common php7.0-dev php7.0-json php7.0-opcache php7.0-cli libapache2-mod-php7.0
-sudo apt-get install -y --force-yes php7.0 php7.0-mysql php7.0-fpm php7.0-curl php7.0-gd php7.0-mcrypt php7.0-mbstring
-sudo apt-get install -y --force-yes php7.0-bcmath php7.0-zip
+sudo apt-get install -y --force-yes php7.2-common php7.2-dev php7.2-json php7.2-opcache php7.2-cli libapache2-mod-php7.2 php7.2-mbstring
+sudo apt-get install -y --force-yes php7.2 php7.2-mysql php7.2-fpm php7.2-curl php7.2-gd php7.2-mcrypt php7.2-mbstring
+sudo apt-get install -y --force-yes php7.2-bcmath php7.2-zip
 Update
 
+echo "-- Make Sure PHP 7.2 is enabled not 7.0 --"
+sudo a2dismod php7.0
+sudo a2enmod php7.2
+
 echo "-- Configure PHP &Apache --"
-sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.0/apache2/php.ini
-sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.0/apache2/php.ini
+sed -i "s/error_reporting = .*/error_reporting = E_ALL/" /etc/php/7.2/apache2/php.ini
+sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.2/apache2/php.ini
 sudo a2enmod rewrite
 
 echo "-- Creating virtual hosts --"
-sudo ln -fs /vagrant/mlbell /var/www/mlbell
+sudo ln -fs /vagrant/atomiclotusapparel.com /var/www/atomiclotusapparel.com
 cat << EOF | sudo tee -a /etc/apache2/sites-available/default.conf
-<Directory "/var/www/">
+<Directory "/var/www/atomiclotusapparel.com">
     AllowOverride All
 </Directory>
 
 <VirtualHost *:80>
-    DocumentRoot /var/www/mlbell
-    ServerName mlbell.vm
+    DocumentRoot /var/www/atomiclotusapparel.com
+    ServerName atomiclotusapparel.vm
 </VirtualHost>
 
 <VirtualHost *:80>
